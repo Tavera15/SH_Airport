@@ -4,6 +4,8 @@
 
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
+#include "Components/PrimitiveComponent.h"
+#include "Engine/TriggerVolume.h"
 #include "DoorAction_AC.generated.h"
 
 UENUM(BlueprintType)
@@ -18,6 +20,7 @@ enum class DoorStatus : uint8 {
 	Opened
 };
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FDoorEvent);
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class MAIN_AIRPORT_API UDoorAction_AC : public UActorComponent
 {
@@ -27,21 +30,30 @@ public:
 	// Sets default values for this component's properties
 	UDoorAction_AC();
 
+	// Called every frame
+	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
+
+	UPROPERTY(BlueprintAssignable)
+		FDoorEvent OnOpen;
+
+	UPROPERTY(BlueprintAssignable)
+		FDoorEvent OnClose;
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Enum")
 		DoorSide Doorside;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Enum")
 		DoorStatus Doorstatus;
 
-	UPrimitiveComponent* theDoor;
 
 protected:
 	// Called when the game starts
 	virtual void BeginPlay() override;
 
-public:	
-	// Called every frame
-	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
+private:	
 
-		
+	UPROPERTY(EditAnywhere)
+		ATriggerVolume* PressurePlate = nullptr;
+
+	bool IsKeyOnPlate();
 };
