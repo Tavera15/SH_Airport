@@ -25,9 +25,13 @@ void UInventoryComponent_AC::BeginPlay()
 {
 	Super::BeginPlay();
 	// ...
-	
-	if(SetupInputComponent())
+
+	if (SetupInputComponent() && !GetOwner()->IsA(AStorage_A::StaticClass()))
+	{
 		PrepareInventory();
+		AddToWindow();
+
+	}
 }
 
 
@@ -41,8 +45,6 @@ void UInventoryComponent_AC::TickComponent(float DeltaTime, ELevelTick TickType,
 void UInventoryComponent_AC::PrepareInventory() 
 {
 	Inventory.Init(FSlotStruct::FSlotStruct(), NumberOfSlots);
-	
-	AddToWindow();
 }
 
 bool UInventoryComponent_AC::SetupInputComponent()
@@ -64,7 +66,7 @@ bool UInventoryComponent_AC::SetupInputComponent()
 void UInventoryComponent_AC::AddToInventory()
 {
 	TArray<AActor*> OverlappingItems;
-	GetOwner()->GetOverlappingActors(OUT OverlappingItems, AItem_A::StaticClass());		// Gets actors of a certain child class
+	GetOwner()->GetOverlappingActors(OUT OverlappingItems, AItem_A::StaticClass());		// Gets actors of a certain Actor child class
 
 	for (auto item : OverlappingItems)
 	{
@@ -73,7 +75,6 @@ void UInventoryComponent_AC::AddToInventory()
 		
 		if (CanCreateStack(TheItemStruct))
 		{
-			AddToWindow();
 			break;
 		}
 	}
@@ -90,7 +91,7 @@ bool UInventoryComponent_AC::CanCreateStack(FItemStruct ItemToAdd)
 			EmptySlot.Item = ItemToAdd;
 			EmptySlot.Quantity = 1;
 			Inventory[i] = EmptySlot;
-
+			AddToWindow();
 			return true;
 		}
 	}
@@ -129,7 +130,7 @@ void UInventoryComponent_AC::AddToWindow()
 void UInventoryComponent_AC::InteractWithOtherInventory()
 {
 	TArray<AActor*> OverlappingSelfItems;
-	GetOwner()->GetOverlappingActors(OUT OverlappingSelfItems, AStorage_A::StaticClass());		// Gets actors of a certain child class
+	GetOwner()->GetOverlappingActors(OUT OverlappingSelfItems, AStorage_A::StaticClass());		// Gets actors of a certain Actor child class
 
 	for (auto item : OverlappingSelfItems)
 	{

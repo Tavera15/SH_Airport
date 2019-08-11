@@ -38,19 +38,23 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Inventory")
 		FVector2D WindowPosition;
 
-	void PrepareInventory();
-	bool CanCreateStack(FItemStruct);
-	bool SetupInputComponent();
-	void AddToInventory();
-	void AddToWindow();
+	UFUNCTION(BlueprintCallable)
+		bool CanCreateStack(FItemStruct SlotToAdd);
 
-	void InteractWithOtherInventory();
+	UFUNCTION(BlueprintCallable)
+		void AddToWindow();
 
 protected:
 	// Called when the game starts
 	virtual void BeginPlay() override;
 
 private:
+
+	void PrepareInventory();
+	bool SetupInputComponent();
+	void AddToInventory();
+	void InteractWithOtherInventory();
+
 	UInputComponent* InputComponent = nullptr;
 	bool IsInventoryWindowOnViewport = false;
 };
