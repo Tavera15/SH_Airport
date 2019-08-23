@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
 #include "ItemStructureCode.h"
+#include "Engine/World.h"
 #include "Item_A.generated.h"
 
 UCLASS()
@@ -22,10 +23,13 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
 		FItemStruct ItemStructure;
 
+	static AItem_A* GetEmptyItem();
+
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
 private:
-	
+
 };

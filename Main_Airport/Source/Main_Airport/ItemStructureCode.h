@@ -19,6 +19,9 @@ struct FItemStruct
 		FString ItemName;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Item")
+		FString ItemDesc;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Item")
 		bool IsConsumable;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Item")
@@ -29,6 +32,7 @@ struct FItemStruct
 	{
 		ID = 0;
 		ItemName = "";
+		ItemDesc = "";
 		IsConsumable = false;
 		Thumbnail = NULL;
 	}

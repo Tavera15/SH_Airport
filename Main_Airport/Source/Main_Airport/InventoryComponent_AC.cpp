@@ -6,7 +6,9 @@
 #include "InventoryWindow_UW.h"
 #include "GameFramework/Actor.h"
 #include "Storage_A.h"
+#include "Runtime/Core/Public/Containers/Array.h"
 #include "Runtime/Engine/Public/TimerManager.h"
+#include "PuzzleActor_A.h"
 #include "Runtime/Engine/Classes/GameFramework/Actor.h"
 
 // Sets default values for this component's properties
@@ -26,11 +28,11 @@ void UInventoryComponent_AC::BeginPlay()
 	Super::BeginPlay();
 	// ...
 
+	PrepareInventory();
+
 	if (SetupInputComponent() && !GetOwner()->IsA(AStorage_A::StaticClass()))
 	{
-		PrepareInventory();
 		AddToWindow();
-
 	}
 }
 
@@ -44,7 +46,14 @@ void UInventoryComponent_AC::TickComponent(float DeltaTime, ELevelTick TickType,
 
 void UInventoryComponent_AC::PrepareInventory() 
 {
+	auto temp = Inventory;
 	Inventory.Init(FSlotStruct::FSlotStruct(), NumberOfSlots);
+	
+	for (int i = 0; i < NumberOfSlots; i++)
+	{
+		if (temp.IsValidIndex(i))
+			Inventory[i] = temp[i];
+	}
 }
 
 bool UInventoryComponent_AC::SetupInputComponent()
@@ -53,7 +62,10 @@ bool UInventoryComponent_AC::SetupInputComponent()
 	if (InputComponent)
 	{
 		InputComponent->BindAction("Inventory", IE_Pressed, this, &UInventoryComponent_AC::AddToInventory);
-		InputComponent->BindAction("Test", IE_Pressed, this, &UInventoryComponent_AC::InteractWithOtherInventory);
+		InputComponent->BindAction("Inventory_Interact", IE_Pressed, this, &UInventoryComponent_AC::InteractWithOtherInventory);
+		//InputComponent->BindAction("Inventory_Interact", IE_Pressed, this, &UInventoryComponent_AC::InteractWithPuzzleActor);
+		InputComponent->BindAction("OpenInventory", IE_Pressed, this, &UInventoryComponent_AC::OpenOwnInventory);
+
 		return true;
 	}
 	else
@@ -73,22 +85,24 @@ void UInventoryComponent_AC::AddToInventory()
 		auto MainItem = Cast<AItem_A>(item);
 		FItemStruct TheItemStruct = MainItem->ItemStructure;
 		
-		if (CanCreateStack(TheItemStruct))
+		if (CanCreateStack(MainItem))
 		{
+			item->SetActorHiddenInGame(true);
 			break;
 		}
 	}
 }
 
-bool UInventoryComponent_AC::CanCreateStack(FItemStruct ItemToAdd)
+bool UInventoryComponent_AC::CanCreateStack(AItem_A* ItemToAdd)
 {
 	FSlotStruct EmptySlot = FSlotStruct::FSlotStruct();
 
 	for (int i = 0; i < NumberOfSlots; i++)
 	{
-		if (Inventory[i].Item.ID == EmptySlot.Item.ID)
+		if (!Inventory.IsValidIndex(i) || Inventory[i].TestItem->ItemStructure.ID == EmptySlot.TestItem->ItemStructure.ID)
 		{
-			EmptySlot.Item = ItemToAdd;
+			EmptySlot.Item = ItemToAdd->ItemStructure;
+			EmptySlot.TestItem = ItemToAdd;
 			EmptySlot.Quantity = 1;
 			Inventory[i] = EmptySlot;
 			AddToWindow();
@@ -137,7 +151,7 @@ void UInventoryComponent_AC::InteractWithOtherInventory()
 		auto StorageInventoryAC = item->FindComponentByClass<UInventoryComponent_AC>();
 		if (StorageInventoryAC)
 		{
-			UE_LOG(LogTemp, Warning, TEXT("Siac has UInventoryAC: %s"), *item->GetName());
+			UE_LOG(LogTemp, Warning, TEXT("Storage Inventory has UInventoryAC: %s"), *item->GetName());
 			StorageInventoryAC->AddToWindow();
 			return;
 		}
@@ -146,4 +160,27 @@ void UInventoryComponent_AC::InteractWithOtherInventory()
 			UE_LOG(LogTemp, Warning, TEXT("Failure"));
 		}
 	}
+}
+
+void UInventoryComponent_AC::OpenOwnInventory()
+{
+	if (!InventoryWindow) { return; }
+
+	auto MyPlayerController = GetWorld()->GetFirstPlayerController();
+
+	if (MyPlayerController->bShowMouseCursor)
+	{
+		MyPlayerController->bShowMouseCursor = false;
+		MyPlayerController->SetInputMode(FInputModeGameOnly::FInputModeGameOnly());
+		return;
+	}
+
+	MyPlayerController->bShowMouseCursor = true;
+	MyPlayerController->SetInputMode(FInputModeGameAndUI::FInputModeGameAndUI());
+}
+
+FSlotStruct UInventoryComponent_AC::GetEmptySlot()
+{
+	//FSlotStruct EmptySlot = FSlotStruct::FSlotStruct();
+	return FSlotStruct::FSlotStruct();
 }

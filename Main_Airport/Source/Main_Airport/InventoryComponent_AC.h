@@ -6,6 +6,7 @@
 #include "Components/ActorComponent.h"
 #include "SlotStructureCode.h"
 #include "Components/InputComponent.h"
+#include "Item_A.h"
 #include "InventoryComponent_AC.generated.h"
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
@@ -39,10 +40,16 @@ public:
 		FVector2D WindowPosition;
 
 	UFUNCTION(BlueprintCallable)
-		bool CanCreateStack(FItemStruct SlotToAdd);
+		bool CanCreateStack(AItem_A* ItemToAdd);
 
 	UFUNCTION(BlueprintCallable)
 		void AddToWindow();
+
+	UFUNCTION(BlueprintCallable)
+		FSlotStruct GetEmptySlot();
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Inventory")
+		TArray<AItem_A*> InventoryItems;
 
 protected:
 	// Called when the game starts
@@ -54,6 +61,9 @@ private:
 	bool SetupInputComponent();
 	void AddToInventory();
 	void InteractWithOtherInventory();
+	void OpenOwnInventory();
+	void InteractWithPuzzleActor();
+	void OpenOtherInventory(UClass*);
 
 	UInputComponent* InputComponent = nullptr;
 	bool IsInventoryWindowOnViewport = false;

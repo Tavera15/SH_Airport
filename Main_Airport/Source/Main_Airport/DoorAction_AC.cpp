@@ -4,8 +4,9 @@
 #include "Engine/StaticMesh.h"
 #include "EngineUtils.h"
 #include "Engine/Classes/Kismet/GameplayStatics.h"
-//#include "Engine/TriggerVolume.h"
+#include "InventoryComponent_AC.h"
 #include "Kismet/KismetMathLibrary.h"
+
 
 // Sets default values for this component's properties
 UDoorAction_AC::UDoorAction_AC()
@@ -32,10 +33,13 @@ void UDoorAction_AC::TickComponent(float DeltaTime, ELevelTick TickType, FActorC
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 	// ...
+
+
 	if (IsKeyOnPlate()) {
 		OnOpen.Broadcast();
 	}
 }
+
 
 bool UDoorAction_AC::IsKeyOnPlate() 
 {
@@ -49,3 +53,4 @@ bool UDoorAction_AC::IsKeyOnPlate()
 
 	return true;
 }
+ 

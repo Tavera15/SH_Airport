@@ -132,3 +132,13 @@ void AMain_AirportCharacter::MoveRight(float Value)
 		AddMovementInput(Direction, Value);
 	}
 }
+
+FVector AMain_AirportCharacter::GetPawnViewLocation() const
+{
+	if (FollowCamera) 
+	{ 
+		return FollowCamera->GetComponentLocation();
+	}
+
+	return Super::GetPawnViewLocation();
+}

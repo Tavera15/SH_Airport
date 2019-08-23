@@ -5,19 +5,15 @@
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
 #include "Components/PrimitiveComponent.h"
+#include "Runtime/Engine/Classes/GameFramework/Character.h"
 #include "Engine/TriggerVolume.h"
+#include "Item_A.h"
 #include "DoorAction_AC.generated.h"
 
 UENUM(BlueprintType)
 enum class DoorSide : uint8 {
 	Left,
 	Right
-};
-
-UENUM()
-enum class DoorStatus : uint8 {
-	Closed,
-	Opened
 };
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FDoorEvent);
@@ -36,14 +32,17 @@ public:
 	UPROPERTY(BlueprintAssignable)
 		FDoorEvent OnOpen;
 
-	UPROPERTY(BlueprintAssignable)
-		FDoorEvent OnClose;
+	UPROPERTY(EditAnywhere)
+		ATriggerVolume* PressurePlate = nullptr;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Enum")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Door")
 		DoorSide Doorside;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Enum")
-		DoorStatus Doorstatus;
+	UPROPERTY(EditInstanceOnly, Category = "Door")
+		ACharacter* Player = nullptr;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Door")
+		bool IsUnlocked;
 
 
 protected:
@@ -52,8 +51,7 @@ protected:
 
 private:	
 
-	UPROPERTY(EditAnywhere)
-		ATriggerVolume* PressurePlate = nullptr;
-
+	bool CanUnlockDoor();
 	bool IsKeyOnPlate();
 };
+ 
