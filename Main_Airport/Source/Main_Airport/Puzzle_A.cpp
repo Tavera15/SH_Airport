@@ -17,7 +17,7 @@ void APuzzle_A::CheckPuzzle()
 {
 	for (int i = 0; i < PuzzleKeys.Num(); i++)
 	{
-		if (PuzzleKeys[i]->ItemStructure.ID != InventoryComponent->Inventory[i].TestItem->ItemStructure.ID)
+		if (InventoryComponent->Inventory[i].TestItem->ItemStructure.ID == 0)
 		{
 			return;
 		}
@@ -32,16 +32,15 @@ void APuzzle_A::RewardPlayer()
 {
 	if (IsPuzzleCompleted != true) { return; }
 
-	// Place all items from puzzle/inventory arrays around Actor
-	// And disable Items to not be recollected
-
-
-	// TODO Check why Enum not working
 	if (RewardType == Reward::REWARD_Spawn)
 	{
 		if (!ItemToSpawnBPClass) { return; }
 
-		auto ItemSpawned = GetWorld()->SpawnActor<AItem_A>(ItemToSpawnBPClass, LocationToSpawn, SpawnItemRotation);
+		auto ItemSpawned = GetWorld()->SpawnActor<AItem_A>(ItemToSpawnBPClass, Transform);
+		if (ItemSpawned)
+		{
+			UE_LOG(LogTemp, Warning, TEXT("Item Spawned"));
+		}
 	}
 	else if (RewardType == Reward::REWARD_Unlock)
 	{
@@ -52,11 +51,13 @@ void APuzzle_A::RewardPlayer()
 			DoorAC->IsUnlocked = true;
 		}
 	}
-	else
+	else if(RewardType == Reward::REWARD_Event)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("NOTHING"));
 		OnEventReward();
 	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Error On RewardPlayer"));
+	}
 
-	UE_LOG(LogTemp, Warning, TEXT("PuzzleCompleted"));
 }

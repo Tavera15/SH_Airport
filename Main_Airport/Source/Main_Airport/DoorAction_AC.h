@@ -41,8 +41,11 @@ public:
 	UPROPERTY(EditInstanceOnly, Category = "Door")
 		ACharacter* Player = nullptr;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+		AItem_A* DoorKey;
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Door")
-		bool IsUnlocked;
+		bool IsUnlocked = false;
 
 
 protected:

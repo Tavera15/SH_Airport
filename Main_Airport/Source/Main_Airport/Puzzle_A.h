@@ -51,6 +51,9 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 		FRotator SpawnItemRotation;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+		FTransform Transform;
+
 	UFUNCTION(BlueprintImplementableEvent, Category = "Reward")
 		void OnEventReward();
 

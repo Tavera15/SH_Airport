@@ -5,6 +5,7 @@
 #include "EngineUtils.h"
 #include "Engine/Classes/Kismet/GameplayStatics.h"
 #include "InventoryComponent_AC.h"
+#include "Runtime/UMG/Public/Blueprint/UserWidget.h"
 #include "Kismet/KismetMathLibrary.h"
 
 
@@ -34,7 +35,6 @@ void UDoorAction_AC::TickComponent(float DeltaTime, ELevelTick TickType, FActorC
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 	// ...
 
-
 	if (IsKeyOnPlate()) {
 		OnOpen.Broadcast();
 	}
@@ -48,9 +48,31 @@ bool UDoorAction_AC::IsKeyOnPlate()
 	TArray<AActor*> OverlappingActors;
 	PressurePlate->GetOverlappingActors(OUT OverlappingActors);
 	
-	if (OverlappingActors.Num() == 0)
-		return false;
-
-	return true;
+	if (OverlappingActors.Num() != 0 && CanUnlockDoor())
+		return true;
+	
+	return false;
 }
  
+bool UDoorAction_AC::CanUnlockDoor()
+{
+	if (IsUnlocked == true) { return true; }
+
+	auto PlayerInventoryComp = Player->FindComponentByClass<UInventoryComponent_AC>();
+	if (!PlayerInventoryComp || !DoorKey) { return false; }
+	
+	auto PlayerInventory = PlayerInventoryComp->Inventory;
+
+	for (int i = 0; i < PlayerInventoryComp->NumberOfSlots; i++)
+	{
+		if (PlayerInventory[i].TestItem->ItemStructure.ID == DoorKey->ItemStructure.ID)
+		{
+			PlayerInventoryComp->Inventory[i] = PlayerInventoryComp->GetEmptySlot();
+			PlayerInventoryComp->AddToWindow();
+			IsUnlocked = true;
+			return true;
+		}
+	}
+
+	return false;
+}

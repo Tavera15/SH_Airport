@@ -63,7 +63,6 @@ bool UInventoryComponent_AC::SetupInputComponent()
 	{
 		InputComponent->BindAction("Inventory", IE_Pressed, this, &UInventoryComponent_AC::AddToInventory);
 		InputComponent->BindAction("Inventory_Interact", IE_Pressed, this, &UInventoryComponent_AC::InteractWithOtherInventory);
-		//InputComponent->BindAction("Inventory_Interact", IE_Pressed, this, &UInventoryComponent_AC::InteractWithPuzzleActor);
 		InputComponent->BindAction("OpenInventory", IE_Pressed, this, &UInventoryComponent_AC::OpenOwnInventory);
 
 		return true;
@@ -88,6 +87,7 @@ void UInventoryComponent_AC::AddToInventory()
 		if (CanCreateStack(MainItem))
 		{
 			item->SetActorHiddenInGame(true);
+			item->SetActorEnableCollision(false);
 			break;
 		}
 	}
